@@ -3,14 +3,15 @@ using UnityEngine;
 public class EngranajesController : MonoBehaviour
 {
     public enum RotationAxis { X, Y, Z }
+    public enum RotationDirection { Horario, Antihorario }
 
     [Header("Configuración de rotación")]
     public RotationAxis ejeRotacion = RotationAxis.Y;
+    public RotationDirection direccionRotacion = RotationDirection.Horario;
     public float velocidadRotacion = 100f;
 
     [Header("Configuración de colisión")]
     public string tagDeCilindro = "Engranaje";
-    public string tagDeEje = "EjeEng";
 
     private bool enContactoConCilindro = false;
 
@@ -20,15 +21,6 @@ public class EngranajesController : MonoBehaviour
         if (collision.gameObject.CompareTag(tagDeCilindro))
         {
             enContactoConCilindro = true;
-        }
-
-        // Si toca un objeto con tag "Eje", posicionamos el cilindro en el centro de ese objeto
-        if (collision.gameObject.CompareTag(tagDeEje))
-        {
-            Vector3 centroDelEje = collision.collider.bounds.center;
-
-            // Posicionamos el cilindro en el centro (sin modificar la altura Y)
-            transform.position = new Vector3(centroDelEje.x, transform.position.y, centroDelEje.z);
         }
     }
 
@@ -48,22 +40,25 @@ public class EngranajesController : MonoBehaviour
         {
             Vector3 eje = Vector3.zero;
 
-            // Dependiendo del eje de rotación seleccionado, asignamos el eje de rotación adecuado
+            // Dependiendo del eje de rotación seleccionado
             switch (ejeRotacion)
             {
                 case RotationAxis.X:
-                    eje = Vector3.right; // Rotación en el eje X
+                    eje = Vector3.right;
                     break;
                 case RotationAxis.Y:
-                    eje = Vector3.up; // Rotación en el eje Y
+                    eje = Vector3.up;
                     break;
                 case RotationAxis.Z:
-                    eje = Vector3.forward; // Rotación en el eje Z
+                    eje = Vector3.forward;
                     break;
             }
 
-            // Realizamos la rotación en el eje elegido
-            transform.Rotate(eje, velocidadRotacion * Time.deltaTime);
+            // Cambiar la dirección de rotación
+            float sentido = (direccionRotacion == RotationDirection.Horario) ? 1f : -1f;
+
+            // Rotamos
+            transform.Rotate(eje, velocidadRotacion * sentido * Time.deltaTime);
         }
     }
 }
